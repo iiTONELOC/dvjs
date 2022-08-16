@@ -1,9 +1,10 @@
 .container {
   padding: 0 2rem;
+  height: 100vh;
 }
 
 .main {
-  min-height: 100vh;
+  height: auto;
   padding: 4rem 0;
   flex: 1;
   display: flex;
@@ -46,10 +47,16 @@
 }
 
 .title,
+.question,
 .description {
   text-align: center;
 }
 
+.question {
+  color: rgb(235, 49, 213)
+}
+
+.question,
 .description {
   margin: 4rem 0;
   line-height: 1.5;
@@ -116,13 +123,16 @@
 }
 
 @media (prefers-color-scheme: dark) {
+
   .card,
   .footer {
     border-color: #222;
   }
+
   .code {
     background: #111;
   }
+
   .logo img {
     filter: invert(1);
   }
