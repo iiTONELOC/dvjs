@@ -1,7 +1,6 @@
-const fs = require('fs');
-const path = require('path');
-const readLine = require('readline');
 const { spawn } = require('child_process');
+const path = require('path');
+
 
 
 function print(message) {
@@ -9,6 +8,7 @@ function print(message) {
 }
 
 async function run(command, pathToFile, args) {
+
     const child = spawn(command, [pathToFile, ...args]);
 
     //return a promise that resolves when the child process exits

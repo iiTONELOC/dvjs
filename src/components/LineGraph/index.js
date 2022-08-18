@@ -20,7 +20,7 @@ class LineGraph extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            Plot: null,
+            Plot: undefined,
             data: props.dataSet,
             layout: { ...plotTheme.layout }
         };
@@ -32,7 +32,7 @@ class LineGraph extends React.Component {
     }
 
     render() {
-        const { Plot } = this.state;
+        const Plot = this.state?.Plot;
         return (Plot ?
             <Plot data={this.state.data} layout={this.state.layout} useResizeHandler className='w-full h-full bg-gray-900 ' /> :
             'Loading...');

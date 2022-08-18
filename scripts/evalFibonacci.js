@@ -1,13 +1,12 @@
 const path = require('path');
 const { runJsScript, runPyScript } = require('./_utils');
+const { MAX_FIB_NUMBER, LIB_FOLDER } = require('../utils/constants');
 
-const maxFibNumber = 1474;
-const arg = process.argv.slice(2)[0] || maxFibNumber;
-const args = [arg <= maxFibNumber ? arg : maxFibNumber];
-
-const libLocation = path.join(process.cwd(), 'lib');
-const jsLocation = path.join(libLocation, 'javascript', 'fibonacci.js');
-const pyLocation = path.join(libLocation, 'python', 'fibonacci.py');
+const argIndex = 2;
+const arg = process.argv.slice(argIndex)[0] || MAX_FIB_NUMBER;
+const args = [arg <= MAX_FIB_NUMBER ? arg : MAX_FIB_NUMBER];
+const pyLocation = path.join(LIB_FOLDER, 'python', 'fibonacci.py');
+const jsLocation = path.join(LIB_FOLDER, 'javascript', 'fibonacci.js');
 
 
 // only run if being called as a script
@@ -19,8 +18,8 @@ if (require.main === module) {
     })();
 }
 
+// API
 module.exports = {
     evalJs: _args => runJsScript(jsLocation, _args),
     evalPy: _args => runPyScript(pyLocation, _args)
 };
-
