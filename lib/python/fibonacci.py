@@ -1,6 +1,13 @@
+import os
 import sys
 import json
 import time
+
+import utils.files as utils
+
+max_fib_number = 1474
+sys.setrecursionlimit(1500)
+max_fib_num_for_basic_recursion = 40
 
 
 def fib_recursive(n):
@@ -57,62 +64,62 @@ def fib_binets_formula(n):
     return (1/sqrt_five)*((first_term)**n - (second_term)**n)
 
 
-def cal_time_in_sec(_start_time, _end_time):
-    return _end_time - _start_time
+def calculate(func, current_fib_number):
+    start_time = time.perf_counter()
+    result = func(current_fib_number)
+    end_time = time.perf_counter()
+
+    time_in_seconds = end_time - start_time
+
+    return {"result": result, "timeInSeconds": time_in_seconds}
 
 
 def evaluate(func, current_fib_number):
-    start_time = time.perf_counter()
-    result = str(int(func(current_fib_number)))
-    end_time = time.perf_counter()
+    function_name = str(func.__name__)
 
-    time_in_seconds = cal_time_in_sec(start_time, end_time)
-
-    return {"result": result, "time_in_seconds": time_in_seconds.__format__('.36f')}
+    if function_name == 'fib_recursive':
+        if current_fib_number <= max_fib_num_for_basic_recursion:
+            return calculate(func, current_fib_number)
+    else:
+        return calculate(func, current_fib_number)
 
 
 def main(args=None):  # NOSONAR
-
     results = {}
-    max_fib_number = 1400
-    num_of_sample_tests = 2
-    sys.setrecursionlimit(1500)
-    max_fib_num_for_basic_recursion = 40
-
     functions = [
         fib_iterative,
         fib_recursive,
         fib_binets_formula,
         fib_recursive_memoized
     ]
-
     number_in_sequence = args if args else max_fib_number
+    file_name = os.path.join(
+        os.getcwd(), 'data', 'fibonacci', 'python', f"fib-py-{number_in_sequence}.json")
 
-    for fun in functions:
-        function_name = str(fun.__name__)
+    if not utils.check_if_file_exists(file_name):
+        for fun in functions:
+            function_name = str(fun.__name__)
 
-        if function_name not in results:
-            results[function_name] = []
+            if function_name not in results:
+                results[function_name] = []
 
-        for _ in range(0, num_of_sample_tests):
-            data = None
-            if function_name == 'fib_recursive':
-                if number_in_sequence <= max_fib_num_for_basic_recursion:
-                    data = evaluate(fun, number_in_sequence)
-            else:
-                data = evaluate(fun, number_in_sequence)
+            for i in range(0, number_in_sequence):
+                results[function_name] = results[function_name]\
+                    if results[function_name] else []
 
-            if data:
-                results[function_name].append(data)
+                data = evaluate(fun, i)
 
-    return results
+                if data:
+                    results[function_name].append(data)
+
+        # Write to file
+        return utils.write_to_file(file_name, json.dumps(results))
 
 
 if __name__ == "__main__":
     _args = sys.argv[1:]
 
     try:
-        print(json.dumps(main(int(_args[0])), indent=2))
-    except Exception as e:
-        print("Error Occurred: {}".format(e))
-        print(json.dumps(main(), indent=2))
+        main(int(_args[0]))
+    except IndexError as e:
+        main()
