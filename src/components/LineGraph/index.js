@@ -1,4 +1,5 @@
 import React from 'react';
+import LoadingSpinner from '../LoadingSpinner';
 
 async function initPlot() {
     return import('react-plotly.js');
@@ -34,8 +35,7 @@ class LineGraph extends React.Component {
     render() {
         const Plot = this.state?.Plot;
         return (Plot ?
-            <Plot data={this.state.data} layout={this.state.layout} useResizeHandler className='w-full h-full bg-gray-900 ' /> :
-            'Loading...');
+            <Plot data={this.state.data} layout={this.state.layout} useResizeHandler className='w-full h-full bg-gray-900 ' /> : <LoadingSpinner />);
     }
 
 }
