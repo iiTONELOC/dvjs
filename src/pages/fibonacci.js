@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Layout, LineGraph, Head, LoadingSpinner } from '../components';
+import { Layout, Head, LoadingSpinner, FibonacciComparativeScatter } from '../components';
 import { genFibTimeComplexityData } from '../../utils/API/fibonacci/helpers/genFibTimeComplexityData';
 
 
@@ -25,15 +25,18 @@ export default function Fibonacci(props) {
     return (
         <main className='w-full h-screen overflow-y-auto overflow-x-hidden'>
             <Head
-                title={'Fibonacci Evaluation JavaScript Vs. Python'}
-                description={'Which language is faster for finding the nth number? Python or JavaScript?'}
+                title='Fibonacci Evaluation JavaScript Vs. Python'
+                description='Which language is faster for finding the nth number? Python or JavaScript?'
             />
 
             <Layout>
-                <section className='flex flex-col min-h-[83%] 2xl:min-h-[89%] justify-center items-center p-3  bg-black'>
+                <section className='flex flex-col h-auto justify-start items-center p-3 bg-zinc-800'>
                     {props?.error && <p>{error.message}</p>}
-
-                    {isMounted && dataSet.length > 0 ? <LineGraph dataSet={dataSet} /> : <LoadingSpinner />}
+                    {
+                        isMounted ?
+                            <FibonacciComparativeScatter dataSet={dataSet} /> :
+                            <LoadingSpinner />
+                    }
                 </section>
             </Layout>
         </main>
@@ -42,10 +45,10 @@ export default function Fibonacci(props) {
 
 export async function getServerSideProps() {
     const { FetchFromAPI } = await import('../../utils/API/FetchFromAPI');
-    const { data, error } = await FetchFromAPI('algos/fibonacci/full-comparison');
+    const { data, error } = await FetchFromAPI('algos/fibonacci/recursive');
 
     return {
-        props: { error, data: data.data }
+        props: { error, data }
     };
 }
 

@@ -13,9 +13,10 @@ const widthAndHeight = {
  * Any valid Tailwindcss color can be used. Defaults to `emerald-400`
  * @param {string?} param.text - The text to display inside the spinner. Defaults to `Loading...` can be turned off by passing false
  */
-export default function LoadingSpinner({ size = widthAndHeight['sm'], color = 'emerald-400', text = 'Loading...' }) {
+export default function LoadingSpinner({ size = widthAndHeight['sm'], color, text = 'Loading...' }) {
     size = widthAndHeight[size] || widthAndHeight['sm'];
-    const spanClasses = `${size} border-b-2 border-${color} rounded-full animate-spin`;
+    const borderColor = color || 'border-emerald-400';
+    const spanClasses = `${size} border-b-2 ${borderColor} rounded-full animate-spin`;
     const sectionClasses = 'w-full h-auto flex flex-row justify-center items-center gap-x-5';
 
     return (

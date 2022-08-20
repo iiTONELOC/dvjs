@@ -5,7 +5,7 @@ const { URL_PREFIX } = require('../constants');
  * @returns {object}  { data, error }
  * @example
  * ```javascript
- * const { data, error } = await FetchFromAPI('algos/fibonacci/full-comparison');
+ * const { data, error } = await FetchFromAPI('algos/fibonacci/full');
  * ```
  */
 async function FetchFromAPI(URL) {
