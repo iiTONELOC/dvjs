@@ -1,4 +1,3 @@
-
 import React from 'react';
 import LoadingSpinner from '../LoadingSpinner';
 
@@ -31,7 +30,8 @@ class Graph extends React.Component {
                 ...plotTheme.layout,
                 title: props.title || '',
                 ...this.props.layout
-            }
+            },
+            revision: 0
         };
     }
 
@@ -43,6 +43,22 @@ class Graph extends React.Component {
         Plot && this.plotLoaded(true);
     }
 
+    componentDidUpdate(prevProps) {
+        if (this.props.layout.title !== prevProps.layout.title) {
+            ;
+            const updatedState = {
+                ...this.state,
+                data: this.props.data,
+                layout: {
+                    ...this.state.layout,
+                    title: this.props.title || '',
+                    ...this.props.layout
+                },
+                revision: this.state.revision + 1
+            };
+            this.setState(updatedState);
+        }
+    }
 
     render() {
         const Plot = this.state?.Plot;
@@ -51,7 +67,6 @@ class Graph extends React.Component {
                 useResizeHandler
                 data={this.state.data}
                 layout={this.state.layout}
-                carpet={false}
                 className=' w-full h-full'
                 config={{ displayModeBar: false }}
             /> : <LoadingSpinner />);

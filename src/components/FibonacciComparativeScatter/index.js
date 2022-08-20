@@ -1,18 +1,9 @@
 import { useState, useEffect } from 'react';
 import Graph from '../Graph';
 import { PlotViewButtons } from './buttons';
+import { defaultDataSets } from './defaults';
 import { dataFetchController } from './dataController';
-import { defaultDataSets, AVAILABLE_DATA_SETS } from './defaults';
-
-// Somethings are convoluted because we have to dynamically import the
-// Plotly library in the Graph component since we are using Next.
-// The import at the top of the file throws errors server-side, even if
-// the code isn't being used. Because of this, we can't init Plotly per the docs
-// unit the component is called. The Plotly object is dynamically imported and set
-// into the Graph's state before it can return itself. Plotly requires that the
-// Plot is configured as a class component which makes additional challenges since
-// we cannot use hooks. No Loading spinner is required as the Graph component returns
-// one by default until the plot is loaded and the data for the graph has been set.
+import { genFibTimeComplexityData } from '../../../utils/API/fibonacci/helpers/genFibTimeComplexityData';
 
 export default function FibonacciComparativeScatter({ dataSet }) {
     // update the default dataSet with the dataSet provided from getServerSideProps
@@ -54,7 +45,8 @@ export default function FibonacciComparativeScatter({ dataSet }) {
         if (dataToSet.data.length === 0) {
             const update = await dataFetchController(_dataSet);
             // update the data object with the new data
-            update?.data && !update?.error && handleSetData(_dataSet, update.data);
+            update?.data && !update?.error && handleSetData(_dataSet,
+                genFibTimeComplexityData(update.data).dataSets);
         } else {
             setCurrentDataSet(dataToSet);
         }
