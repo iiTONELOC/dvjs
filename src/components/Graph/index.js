@@ -1,4 +1,3 @@
-
 import React from 'react';
 import LoadingSpinner from '../LoadingSpinner';
 
@@ -38,12 +37,19 @@ class Graph extends React.Component {
     async componentDidMount() {
         const Plot = await initPlot();
         this.setState({
-            Plot: Plot.default,
+            Plot: Plot.default
         });
         Plot && this.plotLoaded(true);
+        // scrolls the chart into view when it is mounted
+        setTimeout(() => {
+            document
+                .getElementById('fib-plotter')
+                .scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+        }, 250);
     }
-
-
     render() {
         const Plot = this.state?.Plot;
         return (Plot ?

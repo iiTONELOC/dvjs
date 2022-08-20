@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import Graph from '../Graph';
+import LoadingSpinner from '../LoadingSpinner';
 import { PlotViewButtons } from './buttons';
 import { dataFetchController } from './dataController';
 import { defaultDataSets, AVAILABLE_DATA_SETS } from './defaults';
-
+import { genFibTimeComplexityData } from '../../../utils/API/fibonacci/helpers/genFibTimeComplexityData';
 // Somethings are convoluted because we have to dynamically import the
 // Plotly library in the Graph component since we are using Next.
 // The import at the top of the file throws errors server-side, even if
@@ -27,14 +28,14 @@ export default function FibonacciComparativeScatter({ dataSet }) {
     const [plotLoaded, setPlotLoaded] = useState(false);
     // tracks the current view of the plot, defaults to the recursive view
     const [currentDataSet, setCurrentDataSet] = useState(defaultDataSets.recursive);
-
+    const [dataChangeCount, setDataChangeCount] = useState(0);
 
     /*
         HANDLERS
     */
-
     // updates the plot's state so we know when the data has been loaded
     const handlePlotLoaded = stateToSet => setPlotLoaded(stateToSet);
+    const incrementDataChangeCount = () => setDataChangeCount(dataChangeCount + 1);
 
     // updates the state data object with the dataSet provided
     const handleSetData = (requestedDataSet, dataToSet) => {
@@ -44,9 +45,11 @@ export default function FibonacciComparativeScatter({ dataSet }) {
                 data: dataToSet
             }
         });
+
         const dataCopy = { ...data };
         dataCopy[requestedDataSet].data = dataToSet;
         setCurrentDataSet(dataCopy[requestedDataSet]);
+        incrementDataChangeCount();
     };
 
     const handleDataSetChange = async _dataSet => {
@@ -54,10 +57,21 @@ export default function FibonacciComparativeScatter({ dataSet }) {
         if (dataToSet.data.length === 0) {
             const update = await dataFetchController(_dataSet);
             // update the data object with the new data
-            update?.data && !update?.error && handleSetData(_dataSet, update.data);
+            update?.data && !update?.error && handleSetData(_dataSet,
+                genFibTimeComplexityData(update.data).dataSets);
         } else {
             setCurrentDataSet(dataToSet);
+            incrementDataChangeCount();
         }
+    };
+
+    const RenderGraph = () => {
+        return (
+            <Graph
+                {...currentDataSet}
+                plotLoaded={handlePlotLoaded}
+            />
+        );
     };
 
     /*
@@ -70,15 +84,16 @@ export default function FibonacciComparativeScatter({ dataSet }) {
     }, []);
 
     useEffect(() => {
-        if (isMounted && plotLoaded) {
-            document
-                .getElementById('fib-plotter')
-                .scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
+        if (isMounted && dataChangeCount > 0) {
+            // the data has been changed but plotly wont
+            // update the chart so we force an unmount and
+            // re mount the component when it is ready
+            // this isn't the ideal way to do this.
+            // Plotly's docs are horrible and doesn't explain
+            // dynamic behavior, at all.
+            setPlotLoaded(false);
         }
-    }, [isMounted, plotLoaded]);
+    }, [currentDataSet, isMounted, dataChangeCount]);
 
     if (!isMounted) return null;
 
@@ -97,10 +112,11 @@ export default function FibonacciComparativeScatter({ dataSet }) {
             )
             }
             <span id='fib-plotter' className='w-full h-auto'>
-                <Graph
+                {isMounted && <RenderGraph />}
+                {/* <Graph
                     {...currentDataSet}
                     plotLoaded={handlePlotLoaded}
-                />
+                /> */}
             </span>
             {isMounted && plotLoaded && (
                 <PlotViewButtons
